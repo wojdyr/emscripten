@@ -20,6 +20,7 @@ See docs/process.md for more on how version tagging works.
 
 3.1.54 (in development)
 -----------------------
+- SDL2 port updated from v2.24.2 to v2.30.0.
 - The type of `EMSCRIPTEN_WEBGL_CONTEXT_HANDLE` was changed to unsigned and
   the only valid error returned from `emscripten_webgl_create_context` is
   now zero.  This allows `EMSCRIPTEN_WEBGL_CONTEXT_HANDLE` to hold a pointer
