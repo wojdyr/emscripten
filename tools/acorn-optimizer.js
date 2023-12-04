@@ -426,29 +426,26 @@ function runJSDCE(ast, aggressive) {
 
     recursiveWalk(ast, {
       VariableDeclarator(node, c) {
-        const id = node.id;
-        if (id.type === 'ObjectPattern') {
-          id.properties.forEach((node) => {
-            const value = node.value;
-            assert(value.type === 'Identifier');
-            const name = value.name;
-            ensureData(scopes[scopes.length - 1], name).def = 1;
-          });
-        } else if (id.type === 'ArrayPattern') {
-          id.elements.forEach((node) => {
+        function traverse(id) {
+          if (id.type === 'ObjectPattern') {
+            for (const prop of id.properties) {
+              traverse(prop.value);
+            }
+          } else if (id.type === 'ArrayPattern') {
+            for (const elem of id.elements) {
+              traverse(elem)
+            }
+          } else {
             assertAt(
-              node.type === 'Identifier',
-              node,
-              `expected Indentifier but found ${node.type}`,
+              id.type === 'Identifier',
+              id,
+              `expected Indentifier but found ${id.type}`,
             );
-            const name = node.name;
+            const name = id.name;
             ensureData(scopes[scopes.length - 1], name).def = 1;
-          });
-        } else {
-          assertAt(id.type === 'Identifier', id);
-          const name = id.name;
-          ensureData(scopes[scopes.length - 1], name).def = 1;
+          }
         }
+        traverse(node.id);
         if (node.init) c(node.init);
       },
       ObjectExpression(node, c) {
